@@ -32,7 +32,7 @@ static char const *v4l2dev = "/dev/video1";
 static int v4l2sink = -1;
 static int width = 80;                //640;    // Default for Flash
 static int height = 60;        //480;    // Default for Flash
-static char *vidsendbuf = NULL;
+static uint16_t *vidsendbuf = NULL;
 static int vidsendsiz = 0;
 
 static int resets = 0;
@@ -44,7 +44,7 @@ static void init_device() {
 }
 
 static void grab_frame() {
-
+    fprintf( stderr, "enter grab_frame" );
     resets = 0;
     for (int j = 0; j < PACKETS_PER_FRAME; j++) {
         read(spi_cs0_fd, result + sizeof(uint8_t) * PACKET_SIZE * j, sizeof(uint8_t) * PACKET_SIZE);
@@ -103,6 +103,7 @@ static void grab_frame() {
 
         // Set video buffer pixel to scaled colormap value
         //int idx = row * width * 3 + column * 3;
+        fprintf( stderr, "doing the things" );
         vidsendbuf[i] = value;//colormap[3 * value];
         //vidsendbuf[idx + 1] = colormap[3 * value + 1];
         //vidsendbuf[idx + 2] = colormap[3 * value + 2];
@@ -182,6 +183,7 @@ int main(int argc, char **argv)
         sem_wait(&lock2);
         // setup source
         init_device(); // open and setup SPI
+        fprintf( stderr, "blah \n" );
         for (;;) {
             grab_frame();
             // push it out
