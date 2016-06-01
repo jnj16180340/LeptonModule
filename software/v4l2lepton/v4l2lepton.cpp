@@ -90,22 +90,22 @@ static void grab_frame() {
         row = i / PACKET_SIZE_UINT16;
     }
 
-    float diff = maxValue - minValue;
-    float scale = 255 / diff;
+    //float diff = maxValue - minValue;
+    //float scale = 255 / diff;
     for (int i = 0; i < FRAME_SIZE_UINT16; i++) {
         if (i % PACKET_SIZE_UINT16 < 2) {
             continue;
         }
-        value = (frameBuffer[i] - minValue) * scale;
-        const int *colormap = colormap_ironblack;
-        column = (i % PACKET_SIZE_UINT16) - 2;
-        row = i / PACKET_SIZE_UINT16;
+        value = frameBuffer[i];
+        //const int *colormap = colormap_ironblack;
+        //column = (i % PACKET_SIZE_UINT16) - 2;
+        //row = i / PACKET_SIZE_UINT16;
 
         // Set video buffer pixel to scaled colormap value
-        int idx = row * width * 3 + column * 3;
-        vidsendbuf[idx + 0] = colormap[3 * value];
-        vidsendbuf[idx + 1] = colormap[3 * value + 1];
-        vidsendbuf[idx + 2] = colormap[3 * value + 2];
+        //int idx = row * width * 3 + column * 3;
+        vidsendbuf[i] = value;//colormap[3 * value];
+        //vidsendbuf[idx + 1] = colormap[3 * value + 1];
+        //vidsendbuf[idx + 2] = colormap[3 * value + 2];
     }
 
     /*
@@ -136,13 +136,13 @@ static void open_vpipe()
         exit(t);
     v.fmt.pix.width = width;
     v.fmt.pix.height = height;
-    v.fmt.pix.pixelformat = V4L2_PIX_FMT_RGB24;
-    vidsendsiz = width * height * 3;
+    v.fmt.pix.pixelformat = V4L2_PIX_FMT_Y16;
+    vidsendsiz = width * height;
     v.fmt.pix.sizeimage = vidsendsiz;
     t = ioctl(v4l2sink, VIDIOC_S_FMT, &v);
     if( t < 0 )
         exit(t);
-    vidsendbuf = (char*)malloc( vidsendsiz );
+    vidsendbuf = (uint16_t*)malloc( vidsendsiz );
 }
 
 static pthread_t sender;
